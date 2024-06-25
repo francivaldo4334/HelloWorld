@@ -54,30 +54,17 @@ class Main : Game() {
                 }
             }
         }
-        map = buildList {
-            for (i in 0 until (Constants.MAP_HEIGHT * Constants.MAP_WIDTH).toInt()) {
-                if (
-                    (i % Constants.MAP_WIDTH).toInt() == 0 ||
-                    (i % Constants.MAP_WIDTH) == Constants.MAP_WIDTH -1 ||
-                    (i % Constants.MAP_HEIGHT) == Constants.MAP_HEIGHT -1
-                    ) {
-                    add(1)
-                }
-                else
-                    add(0)
-            }
-        }
+        map = Constants.MAP.toList()
     }
 
     override fun render() {
         camera.update()
         batch.projectionMatrix = camera.combined
         batch.begin()
-        for (y in 0 until Constants.MAP_HEIGHT.toInt()) {
-            for (x in 0 until Constants.MAP_WIDTH.toInt()) {
-                val tileIndex = map[(y * Constants.MAP_WIDTH + x).toInt()]
-                batch.draw(tileRegions[tileIndex], x * Constants.TILE_SIZE, y * Constants.TILE_SIZE)
-            }
+        map.forEachIndexed { index, tileIndex ->
+            val y = (index / Constants.MAP_WIDTH).toInt()
+            val x = (index % Constants.MAP_WIDTH).toInt()
+            batch.draw(tileRegions[tileIndex], x * Constants.TILE_SIZE, y * Constants.TILE_SIZE)
         }
         batch.end()
         super.render()
