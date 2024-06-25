@@ -3,11 +3,13 @@ package br.com.helloworld.game
 import br.com.helloworld.game.constants.Constants
 import br.com.helloworld.game.screens.GameScreen
 import com.badlogic.gdx.Game
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import kotlin.random.Random
 
 /** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms. */
 class Main : Game() {
@@ -27,9 +29,15 @@ class Main : Game() {
             (Constants.MAP_WIDTH * Constants.TILE_SIZE).toInt(),
             Pixmap.Format.RGB888
         )
-        pixmap.fillRectangle(0,0,pixmap.width,pixmap.height)
-        pixmap.setColor(0xFFFFFFF)
+        for (y in 0 until (pixmap.height / Constants.TILE_SIZE).toInt()){
+            for (x in 0 until (pixmap.width / Constants.TILE_SIZE).toInt()){
+                pixmap.setColor(Random.nextInt(0xff000000.toInt(), 0xffffffff.toInt()))
+                pixmap.fillRectangle((x * Constants.TILE_SIZE).toInt(), (y * Constants.TILE_SIZE).toInt(), 32, 32)
+            }
+        }
         textureAtlas = Texture(pixmap)
+        pixmap.dispose()
+
         tileRegions = buildList {
             for (y in 0 until (textureAtlas.height / Constants.TILE_SIZE).toInt()) {
                 for (x in 0 until (textureAtlas.width / Constants.TILE_SIZE).toInt()) {
@@ -46,13 +54,19 @@ class Main : Game() {
                 }
             }
         }
-        val numTiles = (textureAtlas.width / Constants.TILE_SIZE) * (textureAtlas.height / Constants.TILE_SIZE)
         map = buildList {
             for (i in 0 until (Constants.MAP_HEIGHT * Constants.MAP_WIDTH).toInt()) {
-                add((i % numTiles).toInt())
+                if (
+                    (i % Constants.MAP_WIDTH).toInt() == 0 ||
+                    (i % Constants.MAP_WIDTH) == Constants.MAP_WIDTH -1 ||
+                    (i % Constants.MAP_HEIGHT) == Constants.MAP_HEIGHT -1
+                    ) {
+                    add(1)
+                }
+                else
+                    add(0)
             }
         }
-        setScreen(GameScreen())
     }
 
     override fun render() {
